@@ -7,12 +7,15 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
+import cdglacier.galleryfordropbox.theme.GalleryTheme
 
 class HomeActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            GalleryApp()
+            GalleryTheme {
+                GalleryApp()
+            }
         }
     }
 }
@@ -27,5 +30,7 @@ private fun GalleryApp() {
 @Preview
 @Composable
 private fun GalleryAppPreview() {
-    GalleryApp()
+    GalleryTheme {
+        GalleryApp()
+    }
 }
