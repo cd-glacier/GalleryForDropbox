@@ -11,6 +11,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import cdglacier.galleryfordropbox.gallery.GalleryScreen
 import cdglacier.galleryfordropbox.theme.GalleryTheme
 import cdglacier.galleryfordropbox.ui.Footer
 
@@ -47,7 +48,7 @@ private fun GalleryApp() {
             startDestination = GalleryAppScreen.Gallery.name
         ) {
             composable(GalleryAppScreen.Gallery.name) {
-                Text("Gallery")
+                GalleryScreen()
             }
 
             composable(GalleryAppScreen.Setting.name) {
