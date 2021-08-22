@@ -10,7 +10,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.GalleryForDropbox">
         <activity
-            android:name=".home.HomeActivity"
+            android:name=".app.GalleryAppActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
