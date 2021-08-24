@@ -3,6 +3,7 @@ package cdglacier.galleryfordropbox.app
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -12,10 +13,12 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import cdglacier.galleryfordropbox.gallery.GalleryScreen
+import cdglacier.galleryfordropbox.model.fakeMedia
 import cdglacier.galleryfordropbox.theme.GalleryTheme
 import cdglacier.galleryfordropbox.ui.Footer
 
 class GalleryAppActivity : AppCompatActivity() {
+    @ExperimentalFoundationApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -26,6 +29,7 @@ class GalleryAppActivity : AppCompatActivity() {
     }
 }
 
+@ExperimentalFoundationApi
 @Composable
 private fun GalleryApp() {
     val navController = rememberNavController()
@@ -48,7 +52,9 @@ private fun GalleryApp() {
             startDestination = GalleryAppScreen.Gallery.name
         ) {
             composable(GalleryAppScreen.Gallery.name) {
-                GalleryScreen()
+                GalleryScreen(
+                    media = fakeMedia()
+                )
             }
 
             composable(GalleryAppScreen.Setting.name) {
@@ -58,6 +64,7 @@ private fun GalleryApp() {
     }
 }
 
+@ExperimentalFoundationApi
 @Preview
 @Composable
 private fun GalleryAppPreview() {
