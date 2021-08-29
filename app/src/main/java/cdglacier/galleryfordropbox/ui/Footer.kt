@@ -55,7 +55,7 @@ fun FooterTab(
         onClick = onSelected,
         modifier = Modifier
             .fillMaxHeight()
-            .width(56.dp),
+            .width(56.dp)
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally
@@ -63,7 +63,8 @@ fun FooterTab(
             Icon(
                 imageVector = icon,
                 contentDescription = text,
-                modifier = Modifier.size(30.dp)
+                modifier = Modifier
+                    .size(30.dp)
             )
 
             Text(
