@@ -35,7 +35,8 @@ fun GalleryScreen(
                     painter = rememberCoilPainter(request = it.url, fadeIn = true),
                     contentDescription = "medium",
                     contentScale = ContentScale.Crop,
-                    modifier = Modifier.size(90.dp)
+                    modifier = Modifier
+                        .size(110.dp)
                 )
             }
         }
