@@ -7,23 +7,33 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import cdglacier.galleryfordropbox.gallery.GalleryScreen
-import cdglacier.galleryfordropbox.model.fakeMedia
+import cdglacier.galleryfordropbox.model.Medium
 import cdglacier.galleryfordropbox.theme.GalleryTheme
 import cdglacier.galleryfordropbox.ui.Footer
 
 class GalleryAppActivity : AppCompatActivity() {
+    private val viewModel: GalleryAppViewModel by lazy {
+        val factory = GalleryAppViewModel.Factory()
+        ViewModelProvider(this, factory)[GalleryAppViewModel::class.java]
+    }
+
     @ExperimentalFoundationApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        viewModel.initializeMedia()
+
         setContent {
             GalleryTheme {
-                GalleryApp()
+                GalleryApp(viewModel)
             }
         }
     }
@@ -31,12 +41,14 @@ class GalleryAppActivity : AppCompatActivity() {
 
 @ExperimentalFoundationApi
 @Composable
-private fun GalleryApp() {
+private fun GalleryApp(viewModel: GalleryAppViewModel) {
     val navController = rememberNavController()
     val backstackEntry = navController.currentBackStackEntryAsState()
     val currentScreen = GalleryAppScreen.fromRoute(
         backstackEntry.value?.destination?.route
     )
+
+    val media: List<Medium>? by viewModel.media.observeAsState(null)
 
     Scaffold(
         bottomBar = {
@@ -53,7 +65,7 @@ private fun GalleryApp() {
         ) {
             composable(GalleryAppScreen.Gallery.name) {
                 GalleryScreen(
-                    media = fakeMedia()
+                    media = media
                 )
             }
 
@@ -61,14 +73,5 @@ private fun GalleryApp() {
                 Text("Setting")
             }
         }
-    }
-}
-
-@ExperimentalFoundationApi
-@Preview
-@Composable
-private fun GalleryAppPreview() {
-    GalleryTheme {
-        GalleryApp()
     }
 }

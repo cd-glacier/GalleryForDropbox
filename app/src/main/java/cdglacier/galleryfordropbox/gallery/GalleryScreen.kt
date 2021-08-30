@@ -22,22 +22,24 @@ import com.google.accompanist.coil.rememberCoilPainter
 @ExperimentalFoundationApi
 @Composable
 fun GalleryScreen(
-    media: List<Medium>
+    media: List<Medium>?
 ) {
     Surface(
         modifier = Modifier
             .fillMaxHeight()
             .fillMaxWidth()
     ) {
-        LazyVerticalGrid(cells = GridCells.Adaptive(minSize = 110.dp)) {
-            items(media) {
-                Image(
-                    painter = rememberCoilPainter(request = it.url, fadeIn = true),
-                    contentDescription = "medium",
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .size(110.dp)
-                )
+        media?.let {
+            LazyVerticalGrid(cells = GridCells.Adaptive(minSize = 110.dp)) {
+                items(it) {
+                    Image(
+                        painter = rememberCoilPainter(request = it.url, fadeIn = true),
+                        contentDescription = "medium",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .size(110.dp)
+                    )
+                }
             }
         }
     }
