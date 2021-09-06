@@ -14,16 +14,26 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import cdglacier.galleryfordropbox.data.medium.FakeMediumRepositoryImpl
+import cdglacier.galleryfordropbox.data.medium.MediumRepositoryImpl
 import cdglacier.galleryfordropbox.gallery.GalleryScreen
 import cdglacier.galleryfordropbox.model.Medium
 import cdglacier.galleryfordropbox.theme.GalleryTheme
 import cdglacier.galleryfordropbox.ui.Footer
+import com.dropbox.core.DbxRequestConfig
+import com.dropbox.core.v2.DbxClientV2
 
 class GalleryAppActivity : AppCompatActivity() {
     private val viewModel: GalleryAppViewModel by lazy {
-        val mediumRepository = FakeMediumRepositoryImpl()
-       
+
+        val accessToken =
+            "XXXXXXX"
+        val config = DbxRequestConfig("cdglacier/gallery_box")
+        val dropbox = DbxClientV2(
+            config,
+            accessToken
+        )
+        val mediumRepository = MediumRepositoryImpl(dropbox)
+
         val factory = GalleryAppViewModel.Factory(mediumRepository)
         ViewModelProvider(this, factory)[GalleryAppViewModel::class.java]
     }
