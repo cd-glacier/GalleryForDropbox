@@ -1,25 +1,29 @@
 package cdglacier.galleryfordropbox.app
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.*
+import cdglacier.galleryfordropbox.data.medium.MediumRepository
 import cdglacier.galleryfordropbox.model.Medium
-import cdglacier.galleryfordropbox.model.fakeMedia
+import kotlinx.coroutines.launch
 
-class GalleryAppViewModel : ViewModel() {
+class GalleryAppViewModel(
+    private val mediumRepository: MediumRepository
+) : ViewModel() {
     private val _media = MutableLiveData<List<Medium>?>(null)
     val media: LiveData<List<Medium>?>
         get() = _media
 
-    fun initializeMedia() {
-        _media.value = fakeMedia()
+    fun initializeMedia() = viewModelScope.launch {
+        _media.value = mediumRepository.listMedia().getOrThrow()
     }
 
-    class Factory : ViewModelProvider.NewInstanceFactory() {
+    class Factory(
+        private val mediumRepository: MediumRepository
+    ) : ViewModelProvider.NewInstanceFactory() {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-            return GalleryAppViewModel() as T
+            return GalleryAppViewModel(
+                mediumRepository = mediumRepository
+            ) as T
         }
     }
 }
