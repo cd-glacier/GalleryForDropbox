@@ -6,12 +6,14 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 class MediumRepositoryImpl(
-    private val dropbox: DbxClientV2
+    var dropbox: DbxClientV2?
 ) : MediumRepository {
     override suspend fun listMedia(): Result<List<Medium>> = withContext(Dispatchers.IO) {
-        val folders = dropbox.files().listFolder("")
+        val folders = dropbox?.files()?.listFolder("")
         println("---------")
-        println(folders.entries.map { it.name })
+        println(folders?.entries?.map { it.name })
+
+        // TODO: get photo url
 
         Result.success(listOf())
     }

@@ -4,6 +4,8 @@ import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.layout.Row
+import androidx.compose.material.Button
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -14,27 +16,23 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import cdglacier.galleryfordropbox.BuildConfig
 import cdglacier.galleryfordropbox.data.medium.MediumRepositoryImpl
 import cdglacier.galleryfordropbox.gallery.GalleryScreen
 import cdglacier.galleryfordropbox.model.Medium
 import cdglacier.galleryfordropbox.theme.GalleryTheme
 import cdglacier.galleryfordropbox.ui.Footer
 import com.dropbox.core.DbxRequestConfig
+import com.dropbox.core.android.Auth
+import com.dropbox.core.oauth.DbxCredential
 import com.dropbox.core.v2.DbxClientV2
 
 class GalleryAppActivity : AppCompatActivity() {
+    private val DROPBOX_KEY = BuildConfig.DROPBOX_KEY
+
     private val viewModel: GalleryAppViewModel by lazy {
-
-        val accessToken =
-            "XXXXXXX"
-        val config = DbxRequestConfig("cdglacier/gallery_box")
-        val dropbox = DbxClientV2(
-            config,
-            accessToken
-        )
-        val mediumRepository = MediumRepositoryImpl(dropbox)
-
-        val factory = GalleryAppViewModel.Factory(mediumRepository)
+        val mediumRepository = MediumRepositoryImpl(dropbox = null)
+        val factory = GalleryAppViewModel.Factory(application, mediumRepository)
         ViewModelProvider(this, factory)[GalleryAppViewModel::class.java]
     }
 
@@ -42,19 +40,50 @@ class GalleryAppActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        viewModel.initializeMedia()
-
         setContent {
             GalleryTheme {
-                GalleryApp(viewModel)
+                GalleryApp(viewModel) { startDropboxAuthorization() }
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        val localCredential: DbxCredential? = viewModel.getLocalCredential()
+        val credential: DbxCredential? = if (localCredential == null) {
+            val credential = Auth.getDbxCredential() //fetch the result from the AuthActivity
+            credential?.let {
+                viewModel.storeCredentialLocally(it)
+                viewModel.setDropboxClient(requireNotNull(createDropboxClient()))
+                viewModel.initializeMedia()
+            }
+            credential
+        } else localCredential
+    }
+
+    private fun createDropboxClient(): DbxClientV2? {
+        val requestConfig = DbxRequestConfig("GalleryBox/1.0.0")
+        val credential = viewModel.getLocalCredential()
+        return credential?.let {
+            DbxClientV2(requestConfig, credential)
+        }
+    }
+
+    private fun startDropboxAuthorization() {
+        val clientIdentifier = "GalleryBox/1.0.0"
+        val requestConfig = DbxRequestConfig(clientIdentifier)
+        val scopes = listOf("account_info.read", "files.content.read")
+        Auth.startOAuth2PKCE(this, DROPBOX_KEY, requestConfig, scopes)
     }
 }
 
 @ExperimentalFoundationApi
 @Composable
-private fun GalleryApp(viewModel: GalleryAppViewModel) {
+private fun GalleryApp(
+    viewModel: GalleryAppViewModel,
+    startAuthorization: () -> Unit
+) {
     val navController = rememberNavController()
     val backstackEntry = navController.currentBackStackEntryAsState()
     val currentScreen = GalleryAppScreen.fromRoute(
@@ -83,8 +112,17 @@ private fun GalleryApp(viewModel: GalleryAppViewModel) {
             }
 
             composable(GalleryAppScreen.Setting.name) {
-                Text("Setting")
+                Row {
+                    Button(onClick = startAuthorization) {
+                        Text(text = "AUTH")
+                    }
+
+                    Button(onClick = { viewModel.revokeDropbox() }) {
+                        Text(text = "REVOKE")
+                    }
+                }
             }
         }
     }
 }
+
