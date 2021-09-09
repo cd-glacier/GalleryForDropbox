@@ -51,15 +51,19 @@ class GalleryAppActivity : AppCompatActivity() {
         super.onResume()
 
         val localCredential: DbxCredential? = viewModel.getLocalCredential()
-        val credential: DbxCredential? = if (localCredential == null) {
+        if (localCredential == null) {
             val credential = Auth.getDbxCredential() //fetch the result from the AuthActivity
             credential?.let {
                 viewModel.storeCredentialLocally(it)
-                viewModel.setDropboxClient(requireNotNull(createDropboxClient()))
-                viewModel.initializeMedia()
             }
-            credential
-        } else localCredential
+        }
+
+        val dropbox = createDropboxClient()
+
+        dropbox?.run {
+            viewModel.setDropboxClient(this)
+            viewModel.initializeMedia()
+        }
     }
 
     private fun createDropboxClient(): DbxClientV2? {
@@ -73,7 +77,7 @@ class GalleryAppActivity : AppCompatActivity() {
     private fun startDropboxAuthorization() {
         val clientIdentifier = "GalleryBox/1.0.0"
         val requestConfig = DbxRequestConfig(clientIdentifier)
-        val scopes = listOf("account_info.read", "files.content.read")
+        val scopes = listOf("account_info.read", "files.content.read", "file_requests.read")
         Auth.startOAuth2PKCE(this, DROPBOX_KEY, requestConfig, scopes)
     }
 }

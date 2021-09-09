@@ -1,11 +1,15 @@
 package cdglacier.galleryfordropbox.model
 
+import android.graphics.Bitmap
+
 interface Medium {
     val url: String
+    val bitmap: Bitmap?
 }
 
 data class Photo(
-    override val url: String
+    override val url: String,
+    override val bitmap: Bitmap? = null
 ) : Medium
 
 fun fakeMedia(): List<Medium> = listOf(
