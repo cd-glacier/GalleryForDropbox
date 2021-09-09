@@ -1,5 +1,6 @@
 package cdglacier.galleryfordropbox.app
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
@@ -19,6 +20,7 @@ import androidx.navigation.compose.rememberNavController
 import cdglacier.galleryfordropbox.BuildConfig
 import cdglacier.galleryfordropbox.data.medium.MediumRepositoryImpl
 import cdglacier.galleryfordropbox.gallery.GalleryScreen
+import cdglacier.galleryfordropbox.medium.detail.MediumDetailActivity
 import cdglacier.galleryfordropbox.model.Medium
 import cdglacier.galleryfordropbox.theme.GalleryTheme
 import cdglacier.galleryfordropbox.ui.Footer
@@ -29,6 +31,7 @@ import com.dropbox.core.v2.DbxClientV2
 
 class GalleryAppActivity : AppCompatActivity() {
     private val DROPBOX_KEY = BuildConfig.DROPBOX_KEY
+    private val clientIdentifier = "GalleryBox/1.0.0"
 
     private val viewModel: GalleryAppViewModel by lazy {
         val mediumRepository = MediumRepositoryImpl(dropbox = null)
@@ -42,7 +45,11 @@ class GalleryAppActivity : AppCompatActivity() {
 
         setContent {
             GalleryTheme {
-                GalleryApp(viewModel) { startDropboxAuthorization() }
+                GalleryApp(
+                    viewModel = viewModel,
+                    navigateMediumDetail = { navigateMediumDetail(it) },
+                    startAuthorization = { startDropboxAuthorization() }
+                )
             }
         }
     }
@@ -67,7 +74,7 @@ class GalleryAppActivity : AppCompatActivity() {
     }
 
     private fun createDropboxClient(): DbxClientV2? {
-        val requestConfig = DbxRequestConfig("GalleryBox/1.0.0")
+        val requestConfig = DbxRequestConfig(clientIdentifier)
         val credential = viewModel.getLocalCredential()
         return credential?.let {
             DbxClientV2(requestConfig, credential)
@@ -75,10 +82,14 @@ class GalleryAppActivity : AppCompatActivity() {
     }
 
     private fun startDropboxAuthorization() {
-        val clientIdentifier = "GalleryBox/1.0.0"
         val requestConfig = DbxRequestConfig(clientIdentifier)
         val scopes = listOf("account_info.read", "files.content.read", "file_requests.read")
         Auth.startOAuth2PKCE(this, DROPBOX_KEY, requestConfig, scopes)
+    }
+
+    private fun navigateMediumDetail(medium: Medium) {
+        val intent = Intent(this, MediumDetailActivity::class.java)
+        startActivity(intent)
     }
 }
 
@@ -86,7 +97,8 @@ class GalleryAppActivity : AppCompatActivity() {
 @Composable
 private fun GalleryApp(
     viewModel: GalleryAppViewModel,
-    startAuthorization: () -> Unit
+    startAuthorization: () -> Unit,
+    navigateMediumDetail: (Medium) -> Unit
 ) {
     val navController = rememberNavController()
     val backstackEntry = navController.currentBackStackEntryAsState()
@@ -111,7 +123,8 @@ private fun GalleryApp(
         ) {
             composable(GalleryAppScreen.Gallery.name) {
                 GalleryScreen(
-                    media = media
+                    media = media,
+                    onMediumClick = navigateMediumDetail
                 )
             }
 

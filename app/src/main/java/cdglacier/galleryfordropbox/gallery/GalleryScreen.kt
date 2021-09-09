@@ -4,6 +4,7 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -25,7 +26,8 @@ import cdglacier.galleryfordropbox.theme.GalleryTheme
 @ExperimentalFoundationApi
 @Composable
 fun GalleryScreen(
-    media: List<Medium>?
+    media: List<Medium>?,
+    onMediumClick: (Medium) -> Unit
 ) {
     Surface(
         modifier = Modifier
@@ -41,6 +43,7 @@ fun GalleryScreen(
                         contentScale = ContentScale.Crop,
                         modifier = Modifier
                             .size(110.dp)
+                            .clickable { onMediumClick(it) },
                     )
                 }
 
@@ -59,7 +62,8 @@ fun GalleryScreen(
 fun GalleryScreenPreview() {
     GalleryTheme {
         GalleryScreen(
-            media = fakeMedia()
+            media = fakeMedia(),
+            onMediumClick = {}
         )
     }
 }
