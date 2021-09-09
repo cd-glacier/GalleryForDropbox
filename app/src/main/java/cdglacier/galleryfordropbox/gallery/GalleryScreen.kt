@@ -2,6 +2,7 @@ package cdglacier.galleryfordropbox.gallery
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
@@ -39,6 +40,10 @@ fun GalleryScreen(
                         modifier = Modifier
                             .size(110.dp)
                     )
+                }
+
+                item {
+                    Spacer(modifier = Modifier.size(300.dp))
                 }
             }
         }
