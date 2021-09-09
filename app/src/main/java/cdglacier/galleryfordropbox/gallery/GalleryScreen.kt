@@ -1,5 +1,7 @@
 package cdglacier.galleryfordropbox.gallery
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Spacer
@@ -34,7 +36,7 @@ fun GalleryScreen(
             LazyVerticalGrid(cells = GridCells.Adaptive(minSize = 110.dp)) {
                 items(it) {
                     Image(
-                        it.bitmap!!.asImageBitmap(),
+                        it.bitmap.asImageBitmap(),
                         contentDescription = "medium",
                         contentScale = ContentScale.Crop,
                         modifier = Modifier
@@ -50,6 +52,7 @@ fun GalleryScreen(
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @ExperimentalFoundationApi
 @Preview
 @Composable

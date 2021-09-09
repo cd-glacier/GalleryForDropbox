@@ -29,14 +29,17 @@ class MediumRepositoryImpl(
                 ThumbnailArg(it, ThumbnailFormat.PNG, ThumbnailSize.W640H480, ThumbnailMode.STRICT)
             }
 
-        val bitMaps = dropbox!!.files().getThumbnailBatch(thumbnailArgs)
+        val media = dropbox!!.files().getThumbnailBatch(thumbnailArgs)
             .entries
             .map {
                 val decoded = Base64.getDecoder().decode(it.successValue.thumbnail)
-                BitmapFactory.decodeStream(ByteArrayInputStream(decoded))
-            }
+                val bitmap = BitmapFactory.decodeStream(ByteArrayInputStream(decoded))
 
-        val media = bitMaps.map { Photo("", it) }
+                Photo(
+                    id = it.successValue.metadata.id,
+                    bitmap = bitmap
+                )
+            }
 
         Result.success(media)
     }
