@@ -89,6 +89,7 @@ class GalleryAppActivity : AppCompatActivity() {
 
     private fun navigateMediumDetail(medium: Medium) {
         val intent = Intent(this, MediumDetailActivity::class.java)
+        intent.putExtra(MediumDetailActivity.EXTRA_MEDIUM_ID, medium.id)
         startActivity(intent)
     }
 }

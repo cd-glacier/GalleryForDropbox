@@ -15,18 +15,28 @@ import androidx.compose.ui.tooling.preview.Preview
 import cdglacier.galleryfordropbox.theme.GalleryTheme
 
 class MediumDetailActivity : AppCompatActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val mediumId = intent.extras?.getString(EXTRA_MEDIUM_ID)
+
         setContent {
             GalleryTheme {
-                MediumDetail()
+                MediumDetail(mediumId = requireNotNull(mediumId))
             }
         }
+    }
+   
+    companion object {
+        val EXTRA_MEDIUM_ID = "medium_id"
     }
 }
 
 @Composable
-fun MediumDetail() {
+fun MediumDetail(
+    mediumId: String
+) {
     Surface(
         modifier = Modifier
             .fillMaxHeight()
@@ -35,7 +45,12 @@ fun MediumDetail() {
         Column() {
             Text(
                 text = "Media Detail",
-                style = MaterialTheme.typography.body2
+                style = MaterialTheme.typography.h3
+            )
+
+            Text(
+                text = mediumId,
+                style = MaterialTheme.typography.subtitle1
             )
         }
     }
@@ -45,6 +60,6 @@ fun MediumDetail() {
 @Composable
 fun MediumDetailPreview() {
     GalleryTheme {
-        MediumDetail()
+        MediumDetail("medium_id")
     }
 }
